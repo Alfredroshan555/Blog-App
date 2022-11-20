@@ -1,4 +1,4 @@
-import { Button } from "antd";
+import { Button,notification } from "antd";
 import React, { useState, useEffect } from "react";
 import styles from "./createposts.module.scss";
 import { getFirestore } from "firebase/firestore";
@@ -13,6 +13,7 @@ const CreatePost = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [userId, setUserId] = useState("");
+  const [api, contextHolder] = notification.useNotification();
 
   const router = useRouter();
   const auth = getAuth();
@@ -34,17 +35,27 @@ const CreatePost = () => {
       //   description: description,
       // });
       // console.log("Document written with ID: ", data);
-      alert("Post created successfully!!");
+      // alert("Post created successfully!!");
       setTitle("");
       setDescription("");
       router.push("/");
+      openNotification()
     } catch (e) {
       console.error("Error adding document: ", e);
     }
   };
 
+  const openNotification = () => {
+    api.open({
+      message: 'New Message',
+      description:"Post Created Successfully !!" 
+    
+    });
+  };
+
   return (
     <div className={`${styles.main_container} container border`}>
+      {contextHolder}
       <div className="mt-4">
         <h3>Create A New Post</h3>
         <div className="mb-3 mt-3">
