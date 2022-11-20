@@ -30,7 +30,8 @@ const EditPost = () => {
   return (
     <div className={`${styles.main_container} container border`}>
       <div className="mt-4">
-        <div className="mb-3">
+        <h3>Edit Post</h3>
+        <div className="mb-3 mt-3">
           <label for="exampleInputEmail1" className="form-label">
             Post Title
           </label>

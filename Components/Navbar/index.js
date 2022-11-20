@@ -4,21 +4,26 @@ import styles from "./navbar.module.scss";
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import { initFirebase } from "../../firebase.config";
 import { useRouter } from "next/router";
+import { LeftSquareTwoTone } from "@ant-design/icons";
+import { notification } from "antd";
 
 export default function Navbar() {
   const [user, userPresent] = useState(false);
+  const [api, contextHolder] = notification.useNotification();
 
   const router = useRouter();
 
   const auth = getAuth();
   const app = initFirebase();
 
+  // Logout the user
   const logOut = () => {
     signOut(auth)
       .then((user) => {
         // Sign-out successful.
         console.log("signed out", user);
         router.push("/signup");
+        openNotification()
       })
       .catch((error) => {
         // An error happened.
@@ -31,21 +36,26 @@ export default function Navbar() {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         const uid = user.uid;
-        console.log("user", user);
+        // console.log("user", user);
         userPresent(true);
-        // setUser(user.email);
-
-        // ...
       } else {
-        // User is signed out
-        // ...
         userPresent(false);
       }
     });
   }, []);
 
+    // Notifications alert
+    const openNotification = () => {
+      api.open({
+        message: 'Blog Posts',
+        description:"You have logged out" 
+      
+      });
+    };
+
   return (
     <div className={`${styles.navbar}  container`}>
+      {contextHolder}
       <ul className={`${styles.navbar_ul} `}>
         {!user && (
           <>

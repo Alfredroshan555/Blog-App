@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from "react";
 import styles from "./signup.module.scss";
-import { Button, Input } from "antd";
+import { Button, Input,notification } from "antd";
 import { GoogleOutlined, FacebookOutlined } from "@ant-design/icons";
-import { createUserWithEmailAndPassword,signInWithPopup, GoogleAuthProvider,FacebookAuthProvider } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
+  FacebookAuthProvider,
+} from "firebase/auth";
 import { getAuth } from "firebase/auth";
 import { initFirebase } from "../../firebase.config";
 import { useRouter } from "next/router";
@@ -12,11 +17,13 @@ export default function SignUpPage() {
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [api, contextHolder] = notification.useNotification();
 
   const router = useRouter();
 
   // Initialize Firebase on the page
-  const app = initFirebase();
+  // const app = initFirebase();
+  // Initialize Auth
   const auth = getAuth();
   const googleProvider = new GoogleAuthProvider();
   const fbProvider = new FacebookAuthProvider();
@@ -28,19 +35,17 @@ export default function SignUpPage() {
       username: username,
       password: password,
     };
-    console.log("user created", userData);
+
     createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         // Signed in
         const user = userCredential.user;
-        console.log("userdata", user);
+        // console.log("userdata", user);
         router.push("/");
-        // ...
       })
       .catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
-        // ..
       });
     if (password !== confirmPassword) {
       alert("passwords are not matching");
@@ -51,58 +56,70 @@ export default function SignUpPage() {
       username === "" ||
       confirmPassword === ""
     ) {
-      alert("enter the fields");
+      // alert("enter the fields");
+      openNotification()
     }
   };
 
-  const signUpWithGoogle = () =>{
+  const signUpWithGoogle = () => {
     signInWithPopup(auth, googleProvider)
-  .then((result) => {
-    // This gives you a Google Access Token. You can use it to access the Google API.
-    const credential = GoogleAuthProvider.credentialFromResult(result);
-    const token = credential.accessToken;
-    // The signed-in user info.
-    const user = result.user;
-    // ...
-  }).catch((error) => {
-    // Handle Errors here.
-    const errorCode = error.code;
-    const errorMessage = error.message;
-    // The email of the user's account used.
-    const email = error.customData.email;
-    // The AuthCredential type that was used.
-    const credential = GoogleAuthProvider.credentialFromError(error);
-    // ...
-  });
-  }
+      .then((result) => {
+        // This gives you a Google Access Token. You can use it to access the Google API.
+        const credential = GoogleAuthProvider.credentialFromResult(result);
+        const token = credential.accessToken;
+        // The signed-in user info.
+        const user = result.user;
+        // ...
+      })
+      .catch((error) => {
+        // Handle Errors here.
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        // The email of the user's account used.
+        const email = error.customData.email;
+        // The AuthCredential type that was used.
+        const credential = GoogleAuthProvider.credentialFromError(error);
+        // ...
+      });
+  };
 
-  const signUpWithFacebook = () =>{
+  const signUpWithFacebook = () => {
     signInWithPopup(auth, fbProvider)
-  .then((result) => {
-    // The signed-in user info.
-    const user = result.user;
-    console.log(user)
-    // This gives you a Facebook Access Token. You can use it to access the Facebook API.
-    const credential = FacebookAuthProvider.credentialFromResult(result);
-    const accessToken = credential.accessToken;
+      .then((result) => {
+        // The signed-in user info.
+        const user = result.user;
+        // console.log(user);
+        // This gives you a Facebook Access Token. You can use it to access the Facebook API.
+        const credential = FacebookAuthProvider.credentialFromResult(result);
+        const accessToken = credential.accessToken;
 
-    // ...
-  })
-  .catch((error) => {
-    // Handle Errors here.
-    const errorCode = error.code;
-    const errorMessage = error.message;
-    // The email of the user's account used.
-    const email = error.customData.email;
-    // The AuthCredential type that was used.
-    const credential = FacebookAuthProvider.credentialFromError(error);
+        // ...
+      })
+      .catch((error) => {
+        // Handle Errors here.
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        // The email of the user's account used.
+        const email = error.customData.email;
+        // The AuthCredential type that was used.
+        const credential = FacebookAuthProvider.credentialFromError(error);
 
-    // ...
-  });
-  }
+        // ...
+      });
+  };
+
+  const openNotification = () => {
+    api.open({
+      message: 'Alert',
+      description:"Please enter all the fields" 
+    
+    });
+  };
 
   return (
     <div className="container">
+       {contextHolder}
+      {/* <Button onClick={openNotification}>Click</Button> */}
       <div className={`${styles.login_container} row`}>
         <div className={`${styles.form_box} border`}>
           <div className="mb-3">
@@ -174,18 +191,23 @@ export default function SignUpPage() {
               Sign Up
             </Button>
           </div>
-        <div className={`${styles.social_logins} mt-3`}>
-          <div>Or Continue with</div>
-          <div className={`${styles.icons} mt-2`}>
-            <div className={styles.google}>
-              <GoogleOutlined onClick={signUpWithGoogle} />
-            </div>
-            <div className={styles.facebook}>
-              <FacebookOutlined onClick={signUpWithFacebook} />
+          <div className={`${styles.social_logins} mt-3`}>
+            <div>Or Continue with</div>
+            <div className={`${styles.icons} mt-2`}>
+              <div className={styles.google}>
+                <GoogleOutlined onClick={signUpWithGoogle} />
+              </div>
+              <div className={styles.facebook}>
+                <FacebookOutlined onClick={signUpWithFacebook} />
+              </div>
             </div>
           </div>
-        </div>
-        <div className={`${styles.home} mt-3`} onClick={()=> router.push('/')}>Go to Home</div>
+          <div
+            className={`${styles.home} mt-3`}
+            onClick={() => router.push("/")}
+          >
+            Go to Home
+          </div>
         </div>
       </div>
     </div>

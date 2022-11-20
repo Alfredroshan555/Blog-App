@@ -1,14 +1,21 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./login.module.scss";
-import { Button, Input } from "antd";
+import { Button, Input, notification } from "antd";
 import { GoogleOutlined, FacebookOutlined } from "@ant-design/icons";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+} from "firebase/auth";
 import { initFirebase } from "../../firebase.config";
 import { useRouter } from "next/router";
+import { redirect } from "next/dist/server/api-utils";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [api, contextHolder] = notification.useNotification();
+  const [user, userPresent] = useState(false);
 
   const router = useRouter();
 
@@ -16,10 +23,12 @@ export default function LoginPage() {
   const app = initFirebase();
   const auth = getAuth();
 
+  // Login user
   const loginUser = () => {
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         // Signed in
+        openNotification();
         const user = userCredential.user;
         console.log("logged in,", user);
         router.push("/");
@@ -31,8 +40,32 @@ export default function LoginPage() {
       });
   };
 
+  // Check if User is authenticated
+  useEffect(() => {
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const uid = user.uid;
+        // console.log("user", user);
+        userPresent(true);
+        router.push("/");
+      } else {
+        userPresent(false);
+      }
+    });
+  }, []);
+
+
+  // Notifications alert
+  const openNotification = () => {
+    api.open({
+      message: "Blog Posts",
+      description: "Successfully logged in...!!",
+    });
+  };
+
   return (
     <div className="container">
+      {contextHolder}
       <div className={`${styles.login_container} row`}>
         <div className={`${styles.form_box} border`}>
           <div className="mb-3">

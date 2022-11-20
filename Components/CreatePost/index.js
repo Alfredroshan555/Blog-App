@@ -46,12 +46,14 @@ const CreatePost = () => {
   return (
     <div className={`${styles.main_container} container border`}>
       <div className="mt-4">
-        <div className="mb-3">
+        <h3>Create A New Post</h3>
+        <div className="mb-3 mt-3">
           <label for="exampleInputEmail1" className="form-label">
             Post Title
           </label>
           <input
             type="text"
+            placeholder="Add Post title"
             className="form-control"
             id="exampleInputEmail1"
             aria-describedby="emailHelp"
@@ -64,7 +66,7 @@ const CreatePost = () => {
           </label>
           <textarea
             className={`${styles.text_area} form-control`}
-            placeholder="Leave a comment here"
+            placeholder="Add Post description"
             id="floatingTextarea2"
             onChange={(e) => setDescription(e.target.value)}
           ></textarea>
