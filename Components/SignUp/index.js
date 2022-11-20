@@ -48,7 +48,7 @@ export default function SignUpPage() {
         const errorMessage = error.message;
       });
     if (password !== confirmPassword) {
-      alert("passwords are not matching");
+      openNotification('password')
     }
     if (
       email === "" ||
@@ -108,12 +108,21 @@ export default function SignUpPage() {
       });
   };
 
-  const openNotification = () => {
-    api.open({
-      message: 'Alert',
-      description:"Please enter all the fields" 
-    
-    });
+  const openNotification = (val) => {
+   
+    if (val === "password") {
+      api.open({
+        message: 'Alert',
+        description:"Passwords are not matching" 
+      
+      });
+    }else{
+      api.open({
+        message: 'Alert',
+        description:"Please enter all the fields" 
+      
+      });
+    }
   };
 
   return (
